@@ -38,7 +38,7 @@ def alpha_matting_cutout(
     erode_structure_size: int,
 ) -> PILImage:
 
-    if img.mode == "RGBA" or img.mode == "CMYK":
+    if img.mode in ["RGBA", "CMYK"]:
         img = img.convert("RGB")
 
     img = np.asarray(img)
@@ -75,8 +75,7 @@ def alpha_matting_cutout(
 
 def naive_cutout(img: PILImage, mask: PILImage) -> PILImage:
     empty = Image.new("RGBA", (img.size), 0)
-    cutout = Image.composite(img, empty, mask)
-    return cutout
+    return Image.composite(img, empty, mask)
 
 
 def get_concat_v_multi(imgs: List[PILImage]) -> PILImage:
@@ -127,7 +126,7 @@ def remove(
         return_type = ReturnType.NDARRAY
         img = Image.fromarray(data)
     else:
-        raise ValueError("Input type {} is not supported.".format(type(data)))
+        raise ValueError(f"Input type {type(data)} is not supported.")
 
     if session is None:
         session = new_session("u2net")
@@ -160,7 +159,7 @@ def remove(
         cutouts.append(cutout)
 
     cutout = img
-    if len(cutouts) > 0:
+    if cutouts:
         cutout = get_concat_v_multi(cutouts)
 
     if ReturnType.PILLOW == return_type:
